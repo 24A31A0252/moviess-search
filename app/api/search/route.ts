@@ -30,22 +30,32 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const pages = await Promise.all([1, 2].map((page) => {
+    // TMDB returns up to 20 movies per page. Fetch three pages so searches can show
+    // up to 60 matches instead of stopping after the first page.
+    const pages = await Promise.allSettled([1, 2, 3].map(async (page) => {
+      const isBearerToken = apiKey.startsWith("eyJ")
       const url = `${TMDB_BASE}/search/movie?query=${encodeURIComponent(
         query,
-      )}&include_adult=false&language=en-US&page=${page}&api_key=${apiKey}`
-      return fetch(url, { next: { revalidate: 3600 } })
+      )}&include_adult=false&language=en-US&page=${page}${isBearerToken ? "" : `&api_key=${apiKey}`}`
+      const response = await fetch(url, {
+        headers: isBearerToken ? { Authorization: `Bearer ${apiKey}` } : undefined,
+        next: { revalidate: 3600 },
+      })
+      if (!response.ok) throw new Error(`TMDB page ${page} failed`)
+      return response.json()
     }))
 
-    if (pages.some((res) => !res.ok)) {
+    const pageData = pages
+      .filter((page): page is PromiseFulfilledResult<any> => page.status === "fulfilled")
+      .map((page) => page.value)
+    const movies = pageData.flatMap((data) => data.results ?? [])
+
+    if (movies.length === 0) {
       return NextResponse.json(
         { error: "Failed to reach the movie database." },
         { status: 502 },
       )
     }
-
-    const pageData = await Promise.all(pages.map((res) => res.json()))
-    const movies = pageData.flatMap((data) => data.results ?? [])
 
     const results: Movie[] = movies.slice(0, 30).map((m: any) => ({
       id: m.id,

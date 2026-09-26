@@ -106,8 +106,9 @@ export function MovieSearch() {
         {!error && results.length > 0 && (
           <>
             <p className="mb-5 text-sm text-muted-foreground">
-              {results.length} result{results.length === 1 ? "" : "s"} for{" "}
+              Showing {results.length} movie{results.length === 1 ? "" : "s"} for{" "}
               <span className="font-medium text-foreground">{`"${query}"`}</span>
+              <span className="ml-2 text-xs text-muted-foreground">(up to 60 matches)</span>
             </p>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {results.map((movie) => (
