@@ -16,7 +16,28 @@ const fetcher = async (url: string): Promise<SearchResponse> => {
   return data
 }
 
-const SUGGESTIONS = ["Inception", "Interstellar", "The Dark Knight", "RRR", "Joker"]
+const SUGGESTIONS = [
+  "Inception",
+  "RRR",
+  "Jalsa",
+  "Bahubali",
+  "Joker",
+  "Athadu",
+  "Dark Knight",
+  "Batman",
+  "A Aa",
+  "Peddi",
+  "Rangasthalam",
+  "OG",
+  "VakeelSaab",
+  "GabbarSingh",
+  "Khushi",
+  "Badri",
+  "Tammudu",
+  "Magadheera",
+  "Chirutha",
+  "Leo",
+]
 
 export function MovieSearch() {
   const [input, setInput] = useState("")

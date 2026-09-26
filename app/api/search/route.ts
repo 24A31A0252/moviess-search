@@ -29,13 +29,39 @@ export async function GET(request: NextRequest) {
     )
   }
 
+  const catalogAliases: Record<string, string> = {
+    inception: "Inception",
+    rrr: "RRR",
+    jalsa: "Jalsa",
+    bahubali: "Baahubali",
+    joker: "Joker",
+    athadu: "Athadu",
+    "dark knight": "The Dark Knight",
+    batman: "Batman",
+    "a aa": "A Aa",
+    peddi: "Peddi",
+    rangasthalam: "Rangasthalam",
+    og: "They Call Him OG",
+    vakeelsaab: "Vakeel Saab",
+    "vakeel saab": "Vakeel Saab",
+    gabbarsingh: "Gabbar Singh",
+    "gabbar singh": "Gabbar Singh",
+    khushi: "Kushi",
+    badri: "Badri",
+    tammudu: "Thammudu",
+    magadheera: "Magadheera",
+    chirutha: "Chirutha",
+    leo: "Leo",
+  }
+  const searchQuery = catalogAliases[query.toLowerCase()] ?? query
+
   try {
     // TMDB returns up to 20 movies per page. Fetch three pages so searches can show
     // up to 60 matches instead of stopping after the first page.
     const pages = await Promise.allSettled([1, 2, 3].map(async (page) => {
       const isBearerToken = apiKey.startsWith("eyJ")
       const url = `${TMDB_BASE}/search/movie?query=${encodeURIComponent(
-        query,
+        searchQuery,
       )}&include_adult=false&language=en-US&page=${page}${isBearerToken ? "" : `&api_key=${apiKey}`}`
       const response = await fetch(url, {
         headers: isBearerToken ? { Authorization: `Bearer ${apiKey}` } : undefined,
