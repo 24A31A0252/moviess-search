@@ -29,23 +29,25 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const url = `${TMDB_BASE}/search/movie?query=${encodeURIComponent(
-    query,
-  )}&include_adult=false&language=en-US&page=1&api_key=${apiKey}`
-
   try {
-    const res = await fetch(url, { next: { revalidate: 3600 } })
+    const pages = await Promise.all([1, 2].map((page) => {
+      const url = `${TMDB_BASE}/search/movie?query=${encodeURIComponent(
+        query,
+      )}&include_adult=false&language=en-US&page=${page}&api_key=${apiKey}`
+      return fetch(url, { next: { revalidate: 3600 } })
+    }))
 
-    if (!res.ok) {
+    if (pages.some((res) => !res.ok)) {
       return NextResponse.json(
         { error: "Failed to reach the movie database." },
         { status: 502 },
       )
     }
 
-    const data = await res.json()
+    const pageData = await Promise.all(pages.map((res) => res.json()))
+    const movies = pageData.flatMap((data) => data.results ?? [])
 
-    const results: Movie[] = (data.results ?? []).map((m: any) => ({
+    const results: Movie[] = movies.slice(0, 30).map((m: any) => ({
       id: m.id,
       title: m.title,
       year: m.release_date ? String(m.release_date).slice(0, 4) : null,
