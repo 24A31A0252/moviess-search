@@ -126,6 +126,29 @@ export function MovieSearch() {
 
         {!error && results.length > 0 && (
           <>
+            {results[0].backdropUrl && (
+              <article className="relative mb-8 min-h-[280px] overflow-hidden rounded-2xl border border-border bg-card shadow-2xl sm:min-h-[340px]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={results[0].backdropUrl}
+                  alt={`Banner for ${results[0].title}`}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  crossOrigin="anonymous"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/20" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
+                <div className="relative flex min-h-[280px] max-w-2xl flex-col justify-end p-6 sm:min-h-[340px] sm:p-8">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary">Featured result</p>
+                  <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-5xl">{results[0].title}</h2>
+                  <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                    {results[0].year && <span>{results[0].year}</span>}
+                    {results[0].rating > 0 && <span className="font-medium text-accent">★ {results[0].rating.toFixed(1)} / 10</span>}
+                    {results[0].voteCount > 0 && <span>{results[0].voteCount.toLocaleString()} votes</span>}
+                  </div>
+                  <p className="mt-4 line-clamp-4 max-w-xl text-sm leading-6 text-foreground/80 sm:text-base">{results[0].overview || "No summary is available for this movie yet."}</p>
+                </div>
+              </article>
+            )}
             <p className="mb-5 text-sm text-muted-foreground">
               Showing {results.length} movie{results.length === 1 ? "" : "s"} for{" "}
               <span className="font-medium text-foreground">{`"${query}"`}</span>
